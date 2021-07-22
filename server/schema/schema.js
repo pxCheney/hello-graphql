@@ -1,7 +1,7 @@
 const graphql = require('graphql')
 const _ = require('lodash')
 
-const { GraphQLObjectType, GraphQLString, GraphQLSchema } = require('graphql');
+const { GraphQLObjectType, GraphQLString, GraphQLSchema, GraphQLID } = require('graphql');
 
 const books = [
   { name: "算法导论", genre: "计算机科学", id: "1" },
@@ -13,7 +13,7 @@ const books = [
 const BookType = new GraphQLObjectType({
   name: 'Book',
   fields: () => ({
-    id: { type: GraphQLString },
+    id: { type: GraphQLID },
     name: { type: GraphQLString },
     genre: { type: GraphQLString },
   })
@@ -25,7 +25,7 @@ const RootQuery = new GraphQLObjectType({
   fields: {
     book: {
       type: BookType,
-      args: { id: { type: GraphQLString } },
+      args: { id: { type: GraphQLID } }, // 当 query id 传来 number 时会报错，这时可以使用 GraphQLID 来解决此问题。
       resolve(parent, args, bb) {
         // 从哪里获取数据，比如从数据库获或其它来源
         console.log('PXX', parent, args)
