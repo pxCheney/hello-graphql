@@ -3,10 +3,12 @@ const _ = require('lodash')
 
 const { GraphQLObjectType, GraphQLString, GraphQLSchema, GraphQLID, GraphQLInt } = require('graphql');
 
+// 关联，书是属于作者，作者有很多书
+// 比如：查询一个作者的书 或是 查询一本书的作者
 const books = [
-  { name: "算法导论", genre: "计算机科学", id: "1" },
-  { name: "人性的弱点", genre: "社交", id: "2" },
-  { name: "明朝那些事儿", genre: "历史", id: "3" }
+  { name: '算法导论', genre: '计算机科学', id: '1', authorId: '1' },
+  { name: '人性的弱点', genre: '社交', id: '2', authorId: '2' },
+  { name: '明朝那些事儿', genre: '历史', id: '3', authorId: '3' },
 ]
 const authors = [
   { name: 'uzi', age: 26, id: '1' },
@@ -21,6 +23,13 @@ const BookType = new GraphQLObjectType({
     id: { type: GraphQLID },
     name: { type: GraphQLString },
     genre: { type: GraphQLString },
+    author: {
+      type: AuthorType,
+      resolve(parent, args) {
+        console.log('PX', typeof parent.authorId, _.find(authors, { id: parent.authorId }))
+        return _.find(authors, { id: parent.authorId })
+      }
+    }
   })
 })
 
@@ -42,7 +51,6 @@ const RootQuery = new GraphQLObjectType({
       args: { id: { type: GraphQLID } }, // 当 query id 传来 number 时会报错，这时可以使用 GraphQLID 来解决此问题。
       resolve(parent, args) {
         // 从哪里获取数据，比如从数据库获或其它来源
-        console.log('PXX', parent, args)
         return _.find(books, { id: args.id })
       }
     },
