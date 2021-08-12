@@ -1,7 +1,7 @@
 const graphql = require('graphql')
 const _ = require('lodash')
 
-const { GraphQLObjectType, GraphQLString, GraphQLSchema, GraphQLID, GraphQLInt } = require('graphql');
+const { GraphQLObjectType, GraphQLString, GraphQLSchema, GraphQLID, GraphQLInt, GraphQLList } = require('graphql');
 
 // 关联，书是属于作者，作者有很多书
 // 比如：查询一个作者的书 或是 查询一本书的作者
@@ -9,6 +9,8 @@ const books = [
   { name: '算法导论', genre: '计算机科学', id: '1', authorId: '1' },
   { name: '人性的弱点', genre: '社交', id: '2', authorId: '2' },
   { name: '明朝那些事儿', genre: '历史', id: '3', authorId: '3' },
+  { name: '放羊🐑的星星', genre: '偶像剧', id: '4', authorId: '2' },
+  { name: '诱人的graphql', genre: '计算机科学', id: '5', authorId: '1' },
 ]
 const authors = [
   { name: 'uzi', age: 26, id: '1' },
@@ -26,7 +28,6 @@ const BookType = new GraphQLObjectType({
     author: {
       type: AuthorType,
       resolve(parent, args) {
-        console.log('PX', typeof parent.authorId, _.find(authors, { id: parent.authorId }))
         return _.find(authors, { id: parent.authorId })
       }
     }
@@ -39,6 +40,12 @@ const AuthorType = new GraphQLObjectType({
     id: { type: GraphQLID },
     name: { type: GraphQLString },
     age: { type: GraphQLInt },
+    books: {
+      type: new GraphQLList(BookType),
+      resolve(parent, args) {
+        return _.filter(books, { authorId: parent.id })
+      }
+    }
   })
 })
 
